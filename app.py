@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('survey_data.csv',sep=';')
 
 
-st.write("Data:")
-st.write(df.head())
-
 # st.write("Sprawdzenie brakujących wartości:")
 # st.write(df.isnull().sum())
 
@@ -36,10 +33,15 @@ df['gender'] = df['gender'].map(gender_mapping)
 # replace null and unknown value by text info
 df = df.fillna('Not specified')
 df['age'] = df['age'].replace('unknown', 'No data')
+df['years_of_experience'] = df['years_of_experience'].replace('NaN', 'Brak danych')
 
 # set order for years of experience 
-experience_order = ['0-2', '3-5', '6-10', '11-15', '>=16']
 
+experience_order = ['0-2', '3-5', '6-10', '11-15', '>=16', 'Brak danych']
+df['years_of_experience'] = pd.Categorical(df['years_of_experience'], categories=experience_order, ordered=True)
+
+st.write("Data:")
+st.write(df.head())
 
 # Sidebar with filters
 age_filter = st.sidebar.selectbox("Choose age range:", ['Show all'] + list(df['age'].unique()))
@@ -54,10 +56,10 @@ sweet_salty_filter = st.sidebar.selectbox("Choose taste preference:", ['Show all
 # filter data if option is choosen
 filtered_data = df.copy()
 
-if age_filter != 'Wszystkie':
+if age_filter != 'Show all':
     filtered_data = filtered_data[filtered_data['age'] == age_filter]
 
-if gender_filter != 'Wszystkie':
+if gender_filter != 'Show all':
     filtered_data = filtered_data[filtered_data['gender'] == gender_filter]
 
 if edu_filter:
@@ -75,10 +77,13 @@ if animal_filter:
 if fav_place_filter:
     filtered_data = filtered_data[filtered_data['fav_place'].isin(fav_place_filter)]
 
-if sweet_salty_filter != 'Wszystkie':
+if sweet_salty_filter != 'Show all':
     filtered_data = filtered_data[filtered_data['sweet_or_salty'] == sweet_salty_filter]
 
 # show filtered data
 st.write("Filtered data:")
 st.write(filtered_data)
 
+# Show number of rows
+num_rows = filtered_data.shape[0]
+st.write(f"Number of results: {num_rows}")
