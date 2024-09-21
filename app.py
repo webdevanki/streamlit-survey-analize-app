@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 df = pd.read_csv('survey_data.csv',sep=';')
 
 
-st.write("Dane:")
+st.write("Data:")
 st.write(df.head())
 
 # st.write("Sprawdzenie brakujących wartości:")
@@ -14,7 +14,7 @@ st.write(df.head())
 # st.write("Informacje o danych:")
 # st.write(df.info())
 
-# Dodanie niestandardowego CSS
+# add non standard CSS
 st.markdown("""
     <style>
     [data-testid='stSidebar']{
@@ -29,20 +29,29 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Map gender values
+gender_mapping = {0: "Man", 1: "Woman"}
+df['gender'] = df['gender'].map(gender_mapping)
+
+# replace null and unknown value by text info
+df = df.fillna('Not specified')
+df['age'] = df['age'].replace('unknown', 'No data')
+
+# set order for years of experience 
+experience_order = ['0-2', '3-5', '6-10', '11-15', '>=16']
 
 
+# Sidebar with filters
+age_filter = st.sidebar.selectbox("Choose age range:", ['Show all'] + list(df['age'].unique()))
+gender_filter = st.sidebar.selectbox("Choose gender:", ['Show all'] + list(df['gender'].unique()))
+edu_filter = st.sidebar.multiselect("Select education:", options=list(df['edu_level'].unique()), default=[])
+industry_filter = st.sidebar.multiselect("Select industry:", options=list(df['industry'].unique()), default=[])
+years_of_experience_filter = st.sidebar.multiselect("Select years of experience:", options=list(df['years_of_experience'].unique()), default=[])
+animal_filter = st.sidebar.multiselect("Select fav animal:", options=list(df['fav_animals'].unique()), default=[])
+fav_place_filter = st.sidebar.multiselect("Select fav place to relax:", options=list(df['fav_place'].unique()), default=[])
+sweet_salty_filter = st.sidebar.selectbox("Choose taste preference:", ['Show all'] + list(df['sweet_or_salty'].unique()))
 
-# Sidebar z filtrami
-age_filter = st.sidebar.selectbox("Wybierz przedział wiekowy:", ['Wszystkie'] + list(df['age'].unique()))
-gender_filter = st.sidebar.selectbox("Wybierz płeć:", ['Wszystkie'] + list(df['gender'].unique()))
-edu_filter = st.sidebar.multiselect("Wybierz wykształcenie:", options=list(df['edu_level'].unique()), default=[])
-industry_filter = st.sidebar.multiselect("Wybierz branżę:", options=list(df['industry'].unique()), default=[])
-years_of_experience_filter = st.sidebar.multiselect("Wybierz lata doświadczenia:", options=list(df['years_of_experience'].unique()), default=[])
-animal_filter = st.sidebar.multiselect("Wybierz ulubione zwierzę:", options=list(df['fav_animals'].unique()), default=[])
-fav_place_filter = st.sidebar.multiselect("Wybierz ulubione miejsce do relaksu:", options=list(df['fav_place'].unique()), default=[])
-sweet_salty_filter = st.sidebar.selectbox("Wybierz preferencję smakową:", ['Wszystkie'] + list(df['sweet_or_salty'].unique()))
-
-# Filtrowanie danych na podstawie wybranych filtrów
+# filter data if option is choosen
 filtered_data = df.copy()
 
 if age_filter != 'Wszystkie':
@@ -69,7 +78,7 @@ if fav_place_filter:
 if sweet_salty_filter != 'Wszystkie':
     filtered_data = filtered_data[filtered_data['sweet_or_salty'] == sweet_salty_filter]
 
-# Wyświetlenie przefiltrowanych danych
-st.write("Przefiltrowane dane:")
+# show filtered data
+st.write("Filtered data:")
 st.write(filtered_data)
 
