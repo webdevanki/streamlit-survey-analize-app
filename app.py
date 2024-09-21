@@ -34,7 +34,6 @@ df['age'] = df['age'].replace('unknown', 'No data')
 df['years_of_experience'] = df['years_of_experience'].replace('NaN', 'Brak danych')
 
 # set order for years of experience 
-
 experience_order = ['0-2', '3-5', '6-10', '11-15', '>=16', 'Brak danych']
 df['years_of_experience'] = pd.Categorical(df['years_of_experience'], categories=experience_order, ordered=True)
 
@@ -88,6 +87,21 @@ st.write(filtered_data)
 num_rows = filtered_data.shape[0]
 st.write(f"Number of results: {num_rows}")
 
+# add download button for filtered data
+if st.button("Download filtered data"):
+    filtered_data.to_csv('filtered_data.csv', sep=';', index=False)
+    st.success("Data was downloaded as 'filtered_data.csv'.")  
+
+
+# Show descriptive statistics
+if filtered_data.shape[0] > 0:  # Check if there is any filtered data
+    st.write("Descriptive statistics:")
+    st.write(filtered_data.describe(include='all'))  # Include all columns
+else:
+    st.write("No data to display statistics")
+
+st.markdown("---")
+
 # Function to plot bar chart for selected column
 def plot_bar_chart(data, column):
     plt.figure(figsize=(10, 5))
@@ -103,14 +117,13 @@ st.sidebar.markdown("---")
 column_to_plot = st.sidebar.selectbox("Choose column to visualization:", df.columns)
 
 # Display the plot
+st.write("Show distribution of values in a choosen column")
+
 if filtered_data.shape[0] > 0:  # Check if there is any filtered data
     plot_bar_chart(filtered_data, column_to_plot)
 else:
     st.write("No data to show plot.")
 
-# Show descriptive statistics
-if filtered_data.shape[0] > 0:  # Check if there is any filtered data
-    st.write("Descriptive statistics:")
-    st.write(filtered_data.describe(include='all'))  # Include all columns
-else:
-    st.write("No data to display statistics")
+
+
+ 
