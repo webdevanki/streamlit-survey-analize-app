@@ -15,13 +15,11 @@ df = pd.read_csv('survey_data.csv',sep=';')
 st.markdown("""
     <style>
     [data-testid='stSidebar']{
-        position: relative;
-        margin-left: 0;
-        z-index: 0;
+    
     }
 
     .main {
-        margin-left: 300px; /* Dopasuj szerokość sidebar, np. 250px */
+        
     }
     </style>
     """, unsafe_allow_html=True)
@@ -42,6 +40,8 @@ df['years_of_experience'] = pd.Categorical(df['years_of_experience'], categories
 
 st.write("Data:")
 st.write(df.head())
+
+st.sidebar.header("Filter data:")
 
 # Sidebar with filters
 age_filter = st.sidebar.selectbox("Choose age range:", ['Show all'] + list(df['age'].unique()))
@@ -87,3 +87,30 @@ st.write(filtered_data)
 # Show number of rows
 num_rows = filtered_data.shape[0]
 st.write(f"Number of results: {num_rows}")
+
+# Function to plot bar chart for selected column
+def plot_bar_chart(data, column):
+    plt.figure(figsize=(10, 5))
+    data[column].value_counts().plot(kind='bar', color='skyblue')
+    plt.title(f'Distribution of values ​​in a column {column}')
+    plt.xlabel(column)
+    plt.ylabel('Number of occurrences')
+    plt.xticks(rotation=45)
+    st.pyplot(plt)
+
+st.sidebar.markdown("---") 
+# Sidebar to select a column for the chart
+column_to_plot = st.sidebar.selectbox("Choose column to visualization:", df.columns)
+
+# Display the plot
+if filtered_data.shape[0] > 0:  # Check if there is any filtered data
+    plot_bar_chart(filtered_data, column_to_plot)
+else:
+    st.write("No data to show plot.")
+
+# Show descriptive statistics
+if filtered_data.shape[0] > 0:  # Check if there is any filtered data
+    st.write("Descriptive statistics:")
+    st.write(filtered_data.describe(include='all'))  # Include all columns
+else:
+    st.write("No data to display statistics")
