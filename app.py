@@ -214,16 +214,16 @@ else:
     st.write("No data to show plot.")
 
 def generate_interpretation(data, column):
-    # Tworzymy prompt dla modelu
+    # Prompt for model
     prompt = f"Please interpret the following data distribution: {data[column].value_counts().to_dict()} for the column '{column}'."
     
-    # Wywołujemy API OpenAI przy użyciu klienta openai_client i modelu gpt-4o
+    # call the OpenAI API using the openai_client and the model
     response = openai_client.chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}]
     )
     
-    # Pobieramy treść odpowiedzi z poprawnym dostępem do atrybutów
+    # get the response content with correct access to attributes
     return response.choices[0].message.content
 
 interpretation = generate_interpretation(filtered_data, column_to_plot)
