@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
 
 df = pd.read_csv('survey_data.csv',sep=';')
 
@@ -28,6 +29,10 @@ if 'sweet_salty_filter' not in st.session_state:
 
 # st.write("Informacje o danych:")
 # st.write(df.info())
+
+# Initialize session state for saved filters
+if 'saved_filters' not in st.session_state:
+    st.session_state.saved_filters = {}
 
 # add non standard CSS
 st.markdown("""
@@ -62,8 +67,40 @@ st.write(df.head())
 if st.sidebar.button("Refresh data"):
     st.session_state.clear()  # Clear session state to reset filters
     st.rerun()    # Rerun the app to reset the UI
-st.sidebar.write("Current session state:")
-st.sidebar.write(st.session_state)
+
+# Save current filters button
+if st.sidebar.button("Save current filters"):
+    st.session_state.saved_filters = {
+        'age_filter': st.session_state.age_filter,
+        'gender_filter': st.session_state.gender_filter,
+        'edu_filter': st.session_state.edu_filter,
+        'industry_filter': st.session_state.industry_filter,
+        'years_of_experience_filter': st.session_state.years_of_experience_filter,
+        'animal_filter': st.session_state.animal_filter,
+        'fav_place_filter': st.session_state.fav_place_filter,
+        'sweet_salty_filter': st.session_state.sweet_salty_filter
+    }
+    st.success(f"Filters have been saved: {st.session_state.saved_filters}")
+
+# Load saved filters button
+if st.sidebar.button("Load saved filters") and st.session_state.saved_filters:
+    st.session_state.age_filter = st.session_state.saved_filters.get('age_filter', 'Show all')
+    st.session_state.gender_filter = st.session_state.saved_filters.get('gender_filter', 'Show all')
+    st.session_state.edu_filter = st.session_state.saved_filters.get('edu_filter', [])
+    st.session_state.industry_filter = st.session_state.saved_filters.get('industry_filter', [])
+    st.session_state.years_of_experience_filter = st.session_state.saved_filters.get('years_of_experience_filter', [])
+    st.session_state.animal_filter = st.session_state.saved_filters.get('animal_filter', [])
+    st.session_state.fav_place_filter = st.session_state.saved_filters.get('fav_place_filter', [])
+    st.session_state.sweet_salty_filter = st.session_state.saved_filters.get('sweet_salty_filter', 'Show all')
+    
+    st.success(f"Loaded filters: {st.session_state.saved_filters}")
+
+    time.sleep(2)
+    st.rerun()
+
+
+# st.sidebar.write("Current session state:")
+# st.sidebar.write(st.session_state)
 
 st.sidebar.header("Filter data:")
 
