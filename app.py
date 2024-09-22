@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import time
+from openai import OpenAI
+
+from dotenv import dotenv_values
+import os
+
+MODEL = "gpt-4o"
+env = dotenv_values(".env")
+openai_client = OpenAI(api_key=env["OPENAI_API_KEY"])
 
 df = pd.read_csv('survey_data.csv',sep=';')
 
@@ -205,6 +213,20 @@ if filtered_data.shape[0] > 0:  # Check if there is any filtered data
 else:
     st.write("No data to show plot.")
 
+def generate_interpretation(data, column):
+    # Tworzymy prompt dla modelu
+    prompt = f"Please interpret the following data distribution: {data[column].value_counts().to_dict()} for the column '{column}'."
+    
+    # Wywołujemy API OpenAI przy użyciu klienta openai_client i modelu gpt-4o
+    response = openai_client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    # Pobieramy treść odpowiedzi z poprawnym dostępem do atrybutów
+    return response.choices[0].message.content
 
+interpretation = generate_interpretation(filtered_data, column_to_plot)
+st.write("Interpretation of the results:")
+st.write(interpretation)
 
- 
