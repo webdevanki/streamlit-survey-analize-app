@@ -4,6 +4,24 @@ import matplotlib.pyplot as plt
 
 df = pd.read_csv('survey_data.csv',sep=';')
 
+# Initialize session state for filters
+if 'age_filter' not in st.session_state:
+    st.session_state.age_filter = 'Show all'
+if 'gender_filter' not in st.session_state:
+    st.session_state.gender_filter = 'Show all'
+if 'edu_filter' not in st.session_state:
+    st.session_state.edu_filter = []
+if 'industry_filter' not in st.session_state:
+    st.session_state.industry_filter = []
+if 'years_of_experience_filter' not in st.session_state:
+    st.session_state.years_of_experience_filter = []
+if 'animal_filter' not in st.session_state:
+    st.session_state.animal_filter = []
+if 'fav_place_filter' not in st.session_state:
+    st.session_state.fav_place_filter = []
+if 'sweet_salty_filter' not in st.session_state:
+    st.session_state.sweet_salty_filter = 'Show all'
+
 
 # st.write("Sprawdzenie brakujących wartości:")
 # st.write(df.isnull().sum())
@@ -40,17 +58,43 @@ df['years_of_experience'] = pd.Categorical(df['years_of_experience'], categories
 st.write("Data:")
 st.write(df.head())
 
+# Refresh button
+if st.sidebar.button("Refresh data"):
+    st.session_state.clear()  # Clear session state to reset filters
+    st.rerun()    # Rerun the app to reset the UI
+st.sidebar.write("Current session state:")
+st.sidebar.write(st.session_state)
+
 st.sidebar.header("Filter data:")
 
 # Sidebar with filters
-age_filter = st.sidebar.selectbox("Choose age range:", ['Show all'] + list(df['age'].unique()))
-gender_filter = st.sidebar.selectbox("Choose gender:", ['Show all'] + list(df['gender'].unique()))
-edu_filter = st.sidebar.multiselect("Select education:", options=list(df['edu_level'].unique()), default=[])
-industry_filter = st.sidebar.multiselect("Select industry:", options=list(df['industry'].unique()), default=[])
-years_of_experience_filter = st.sidebar.multiselect("Select years of experience:", options=list(df['years_of_experience'].unique()), default=[])
-animal_filter = st.sidebar.multiselect("Select fav animal:", options=list(df['fav_animals'].unique()), default=[])
-fav_place_filter = st.sidebar.multiselect("Select fav place to relax:", options=list(df['fav_place'].unique()), default=[])
-sweet_salty_filter = st.sidebar.selectbox("Choose taste preference:", ['Show all'] + list(df['sweet_or_salty'].unique()))
+unique_ages = ['Show all'] + list(df['age'].unique())
+age_filter = st.sidebar.selectbox("Choose age range:", unique_ages, index=unique_ages.index(st.session_state.age_filter))
+st.session_state.age_filter = age_filter
+
+unique_genders = ['Show all'] + list(df['gender'].unique())
+gender_filter = st.sidebar.selectbox("Choose gender:", unique_genders, index=unique_genders.index(st.session_state.gender_filter))
+st.session_state.gender_filter = gender_filter
+
+edu_filter = st.sidebar.multiselect("Select education:", options=list(df['edu_level'].unique()), default=st.session_state.edu_filter)
+st.session_state.edu_filter = edu_filter
+
+industry_filter = st.sidebar.multiselect("Select industry:", options=list(df['industry'].unique()), default=st.session_state.industry_filter)
+st.session_state.industry_filter = industry_filter
+
+years_of_experience_options = ['Show all'] + list(df['years_of_experience'].unique())
+years_of_experience_filter = st.sidebar.multiselect("Select years of experience:", options=years_of_experience_options, default=st.session_state.years_of_experience_filter)
+st.session_state.years_of_experience_filter = years_of_experience_filter
+
+animal_filter = st.sidebar.multiselect("Select fav animal:", options=list(df['fav_animals'].unique()), default=st.session_state.animal_filter)
+st.session_state.animal_filter = animal_filter
+
+fav_place_filter = st.sidebar.multiselect("Select fav place to relax:", options=list(df['fav_place'].unique()), default=st.session_state.fav_place_filter)
+st.session_state.fav_place_filter = fav_place_filter
+
+sweet_salty_options = ['Show all'] + list(df['sweet_or_salty'].unique())
+sweet_salty_filter = st.sidebar.selectbox("Choose taste preference:", sweet_salty_options, index=sweet_salty_options.index(st.session_state.sweet_salty_filter))
+st.session_state.sweet_salty_filter = sweet_salty_filter
 
 # filter data if option is choosen
 filtered_data = df.copy()
