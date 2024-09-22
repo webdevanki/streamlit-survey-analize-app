@@ -226,7 +226,18 @@ def generate_interpretation(data, column):
     # get the response content with correct access to attributes
     return response.choices[0].message.content
 
-interpretation = generate_interpretation(filtered_data, column_to_plot)
-st.write("Interpretation of the results:")
-st.write(interpretation)
+# Add a button to generate the interpretation
+if st.button("Generate Interpretation"):
+    if filtered_data.shape[0] > 0:  # Check if there is any filtered data
+        interpretation = generate_interpretation(filtered_data, column_to_plot)
+        st.session_state.interpretation = interpretation  # Store in session state
+        st.write("Interpretation of the results:")
+        st.write(interpretation)
+    else:
+        st.warning("No data available to interpret.")
+        
+# Display the stored interpretation if it exists
+if 'interpretation' in st.session_state:
+    st.write("Previous Interpretation of the results:")
+    st.write(st.session_state.interpretation)
 
